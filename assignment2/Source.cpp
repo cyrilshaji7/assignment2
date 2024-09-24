@@ -9,6 +9,7 @@ using namespace std;
 struct STUDENT_DATA {
     string firstName;
     string lastName;
+    string email;  
 };
 
 void readStudentData(const string& filename, vector<STUDENT_DATA>& students) {
@@ -35,22 +36,51 @@ void readStudentData(const string& filename, vector<STUDENT_DATA>& students) {
     file.close();
 }
 
+#ifdef PRE_RELEASE
+void readStudentEmails(const string& filename, vector<STUDENT_DATA>& students) {
+    ifstream file(filename);
+    string line;
+
+    if (!file.is_open()) {
+        cerr << "Error opening file: " << filename << endl;
+        return;
+    }
+
+    while (getline(file, line)) {
+        istringstream ss(line);
+        string email;
+        if (getline(ss, email)) {
+            students[students.size() - 1].email = email;  
+        }
+    }
+    file.close();
+}
+#endif
+
 void displayStudents(const vector<STUDENT_DATA>& students) {
-    cout << "Students List:\n";
-    for (auto& s : students) {
-        cout << s.firstName << " " << s.lastName << endl;
+    cout << "Student List:\n";
+    for (const auto& student : students) {
+        cout << student.firstName << " " << student.lastName;
+#ifdef PRE_RELEASE
+        cout << ", Email: " << student.email;
+#endif
+        cout << endl;
     }
 }
 
 int main() {
     vector<STUDENT_DATA> students;
+
+#ifdef PRE_RELEASE
+    cout << "Running Pre-Release Version\n";
+#else
+    cout << "Running Standard Version\n";
+#endif
+
     readStudentData("C:\\Users\\Cyril\\Downloads\\resource-files\\StudentData.txt", students);
 
-#ifdef _DEBUG
-    cout << "Debug Mode On.\n";
-    for (const auto& student : students) {
-        cout << "First Name: " << student.firstName << ", Last Name: " << student.lastName << endl;
-    }
+#ifdef PRE_RELEASE
+    readStudentEmails("C:\\Users\\Cyril\\Downloads\\resource-files\\StudentData_Emails.txt", students);
 #endif
 
     displayStudents(students);
